@@ -1,6 +1,6 @@
 import cv2
 from pyzbar.pyzbar import decode
-from camera import Camera
+from FU.camera import Camera
 import numpy as np
 from typing import List, Tuple
 from collections import deque
