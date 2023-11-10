@@ -5,7 +5,7 @@ from typing import Tuple, Any, Dict
 class aligo(): 
     def __init__(self, receiver_name: str) -> None:
         self.config = configparser.ConfigParser()
-        self.config.read('./DATA/config.ini', encoding='utf-8')
+        self.config.read('./DATA_ini/config.ini', encoding='utf-8')
         self.send_url = 'https://apis.aligo.in/send/'
         self.receiver_name = receiver_name
 
@@ -46,5 +46,5 @@ class aligo():
        
         if receiver_dict.get(self.sms_data.get('receiver')) == self.receiver_name:
             send_response = requests.post(self.send_url, data=self.sms_data)
-            
+
             return send_response.json().get('message'), self.receiver_name, send_response.json().get('msg_type')
