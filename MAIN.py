@@ -10,62 +10,10 @@ from FU.api import aligo
 from FU.QR import QRcode_read
 from FU.camera import Camera
 
-class AttendanceApp(QWidget):
-    def __init__(self) -> None:
+class FunctionClass(QWidget):
+    def __init__(self):
         super().__init__()
-        self.setFocusPolicy(Qt.StrongFocus)
-        self.initUI()
-        self.cam = Camera()
-        print(self.cam.cameras_list)
-        self.user = None
-
-    def initUI(self) -> None:
-        self.setWindowTitle('Attendance System')
-        self.setGeometry(100, 100, 720, 1280)
-        self.setMinimumSize(270, 480)
         self.aspect_ratio = 9 / 16  # 원하는 비율
-        self.setStyleSheet("background-color: #01040A;")
-
-        fontDB = QFontDatabase()
-        font_dir = "./DATA/GmarketSansTTF/"
-        font_files = [font_dir + file for file in os.listdir(font_dir) if file.endswith(".ttf")]
-        for font in font_files:
-            fontDB.addApplicationFont(font)
-            
-        state_font = QFont('GmarketSansTTFBold', 35)
-        state_font.setWeight(QFont.Bold)
-        butt_font = QFont('GmarketSansTTFBold', 15)
-        butt_font.setWeight(QFont.Bold)
-        
-        text_box_frame = QFrame(self)
-        self.status_label = QLabel('CLASS LINKER\nTEST', text_box_frame)
-        self.status_label.setStyleSheet(
-            "background-color: #0D1116;"
-            "border: 1px solid #30363D;"
-            "border-radius: 7px;"
-            "color: #F0F6FC;"
-            "padding: 6px;"
-        )
-        self.status_label.setFont(state_font)
-        self.status_label.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
-
-        self.in_button = QPushButton('QR 인증')
-        self.in_button.setStyleSheet(
-            "background-color: #0D1116;"
-            "border: 1px solid #30363D;"
-            "border-radius: 7px;"
-            "color: #F0F6FC;"
-            "padding: 6px;"
-        )
-        self.in_button.setFont(butt_font)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.status_label)
-        layout.addWidget(self.in_button)
-        text_box_frame.setLayout(layout)
-        self.setLayout(layout)
-
-        self.in_button.clicked.connect(self.on_button_clicked)
 
     def toggle_fullscreen(self) -> None:
         screens = QApplication.screens()
@@ -90,17 +38,6 @@ class AttendanceApp(QWidget):
             new_height = int(size.width() / self.aspect_ratio)
             self.resize(size.width(), new_height)
 
-        widget_list = [
-            (self.status_label, 'GmarketSansTTFBold', (3*self.geometry().width()/5-0.5)/10 - 5),
-            (self.in_button, 'GmarketSansTTFBold', (self.geometry().width()/4+3)/10)
-        ]
-
-        for widget, font_name, size in widget_list:
-            font = QFont(font_name, round(size))
-            font.setWeight(QFont.Bold)
-            widget.setFont(font)
-        event.accept()
-
     def keyPressEvent(self, event: QKeyEvent) -> None:
         # F11 키를 누르면 전체 화면 모드를 활성화 / 비활성화
         if event.key() == Qt.Key_F11:
@@ -113,6 +50,77 @@ class AttendanceApp(QWidget):
         elif event.key() == Qt.Key_Escape:
             self.showNormal()  # 전체 화면 해제
             self.setGeometry(100, 100, 720, 1280)
+
+
+class AttendanceApp(FunctionClass):
+    def __init__(self) -> None:
+        super().__init__()
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.initUI()
+        self.cam = Camera()
+        self.widget_list = [
+            (self.status_label, 'Noto Sans KR Black', 0),
+            (self.in_button, 'Noto Sans KR Black', 0)
+        ]
+    
+    def resizeEvent(self, event: QKeyEvent) -> None:
+        super().resizeEvent(event) # 부모 클래스의 resizeEvent 호출
+
+        for widget, font_name, _ in self.widget_list:
+            size = (3*self.geometry().width()/5-0.5)/10 - 5 if widget == self.status_label else (self.geometry().width()/4+3)/10
+            font = QFont(font_name, round(size))
+            font.setWeight(QFont.Bold)
+            widget.setFont(font)
+            font.setWeight(QFont.Bold)
+            if not font.exactMatch():
+                print(f'Could not find an exact match for font {font_name}')
+
+
+    def initUI(self) -> None:
+        self.setWindowTitle('Attendance System')
+        self.setGeometry(100, 100, 720, 1280)
+        self.setMinimumSize(270, 480)
+        self.setStyleSheet("background-color: #F5F5F7;")  # 톤 다운된 배경색으로 변경
+
+        fontDB = QFontDatabase()
+        font_dir = "./DATA/Noto_Sans_KR/"
+        font_files = [font_dir + file for file in os.listdir(font_dir) if file.endswith(".ttf")]
+        for font in font_files:
+            fontDB.addApplicationFont(font)
+
+        for font in font_files:
+            result = fontDB.addApplicationFont(font)
+            if result != -1:  # 폰트가 성공적으로 추가되었다면
+                families = QFontDatabase.applicationFontFamilies(result)
+                print(f'Loaded {font}: {families}')
+
+        text_box_frame = QFrame(self)
+        self.status_label = QLabel('CLASS LINKER TEST', text_box_frame)
+        self.status_label.setStyleSheet(
+            "background-color: #FFFFFF;"  # 톤 다운된 배경색으로 변경
+            "border: 0.5px solid #E5E5E5;"  # 테두리 세밀하게 변경
+            "border-radius: 7px;"
+            "color: #000000;"  # 톤 다운된 글씨 색으로 변경
+            "padding: 6px;"
+        )
+        self.status_label.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
+
+        self.in_button = QPushButton('QR 인증')
+        self.in_button.setStyleSheet(
+            "background-color: #FFFFFF;"  # 톤 다운된 배경색으로 변경
+            "border: 0.5px solid #E5E5E5;"  # 테두리 세밀하게 변경
+            "border-radius: 7px;"
+            "color: #FF0000;"  # 톤 다운된 글씨 색으로 변경
+            "padding: 6px;"
+        )
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.status_label)
+        layout.addWidget(self.in_button)
+        text_box_frame.setLayout(layout)
+        self.setLayout(layout)
+
+        self.in_button.clicked.connect(self.on_button_clicked)
 
     @property
     def user(self) -> str: 
@@ -150,7 +158,6 @@ class AttendanceApp(QWidget):
         cv2.destroyAllWindows()
 
     def api_use(self) -> None:
-        # self.user가 None인 경우에 대한 처리를 추가하였습니다.
         if self.user is None:
             self.status_label.setText("QR 코드를 읽지 못했습니다")
         else:
@@ -161,8 +168,68 @@ class AttendanceApp(QWidget):
             except:
                 self.status_label.setText("SMS 전송에 실패했습니다")
 
+class StartPage(FunctionClass):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('Attendance System')
+        self.setGeometry(100, 100, 720, 1280)
+        self.setMinimumSize(270, 480)
+        self.setStyleSheet("background-color: #F5F5F7;")  # 톤 다운된 배경색으로 변경
+
+        fontDB = QFontDatabase()
+        font_dir = "./DATA/Noto_Sans_KR/"
+        font_files = [font_dir + file for file in os.listdir(font_dir) if file.endswith(".ttf")]
+        for font in font_files:
+            fontDB.addApplicationFont(font)
+
+        for font in font_files:
+            result = fontDB.addApplicationFont(font)
+            if result != -1:  # 폰트가 성공적으로 추가되었다면
+                families = QFontDatabase.applicationFontFamilies(result)
+                print(f'Loaded {font}: {families}')
+
+        self.start_label = QLabel('안녕하세요', self)
+        self.start_label.setStyleSheet(
+            "background-color: #FFFFFF;"  # 톤 다운된 배경색으로 변경
+            "border: 0.5px solid #E5E5E5;"  # 테두리 세밀하게 변경
+            "border-radius: 7px;"
+            "color: #000000;"  # 톤 다운된 글씨 색으로 변경
+            "padding: 6px;"
+        )
+        self.start_label.setAlignment(Qt.AlignCenter | Qt.AlignLeft)
+        
+        layout = QVBoxLayout()
+        layout.addWidget(self.start_label)
+        self.setLayout(layout)
+
+        # widget_list 추가
+        self.widget_list = [
+            (self.start_label, 'Noto Sans KR Black', 0)
+        ]
+
+    def resizeEvent(self, event: QKeyEvent) -> None:
+        super().resizeEvent(event) # 부모 클래스의 resizeEvent 호출
+
+        for widget, font_name, _ in self.widget_list:
+            size = (3*self.geometry().width()/5-0.5)/10 - 5
+            font = QFont(font_name, round(size))
+            font.setWeight(QFont.Bold)
+            widget.setFont(font)
+            font.setWeight(QFont.Bold)
+            if not font.exactMatch():
+                print(f'Could not find an exact match for font {font_name}')
+
+    def mousePressEvent(self, event):
+        self.close()
+        self.attendance_app = AttendanceApp()
+        self.attendance_app.show()
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = AttendanceApp()
+    ex = StartPage()
     ex.show()
     sys.exit(app.exec_())
