@@ -3,6 +3,14 @@ import qrcode
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
 from PyQt5.QtGui import QPixmap
 
+class QRWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+    def resizeEvent(self, event):
+        size = min(self.width(), self.height())
+        self.resize(size, size)
+
 class QRCodeGenerator(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -21,7 +29,7 @@ class QRCodeGenerator(QMainWindow):
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
         
-        self.qr_window = QMainWindow()  # qr_window를 인스턴스 변수로 선언
+        self.qr_window = QRWindow()  # qr_window를 인스턴스 변수로 선언
         
     def generate_qr(self):
         text = self.text_input.text()
@@ -43,6 +51,7 @@ class QRCodeGenerator(QMainWindow):
             qr_label = QLabel(self.qr_window)
             qr_pixmap = QPixmap(file_path)
             qr_label.setPixmap(qr_pixmap)
+            qr_label.setScaledContents(True)  # QLabel의 내용을 QLabel의 크기에 맞게 스케일링
             self.qr_window.setCentralWidget(qr_label)
             self.qr_window.show()
             
