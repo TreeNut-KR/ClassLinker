@@ -34,11 +34,12 @@ class QRCodeGenerator(QMainWindow):
     def generate_qr(self):
         text = self.text_input.text()
         if text:
-            qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+            # version 인자를 제거하거나 None으로 설정
+            qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
             qr.add_data(text)
             qr.make(fit=True)
             qr_image = qr.make_image(fill_color="black", back_color="white")
-            
+                
             folder_path = "QR_FILE"
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
