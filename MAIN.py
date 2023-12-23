@@ -51,7 +51,6 @@ class FunctionClass(QWidget):
             self.showNormal()  # 전체 화면 해제
             self.setGeometry(100, 100, 720, 1280)
 
-
 class AttendanceApp(FunctionClass):
     def __init__(self) -> None:
         super().__init__()
