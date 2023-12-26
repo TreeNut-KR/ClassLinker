@@ -8,8 +8,8 @@
 #define CO2_TX D3
 #define CO2_RX D2
 
-const char* ssid = "U+Net5B5C";
-const char* password = "0D00212GA@";
+const char* ssid = "Aeon_2G";
+const char* password = "Sjmbee04!";
 
 String room = "L23";
 String qrcode;
@@ -70,7 +70,7 @@ void sendPost(String qrCode) {
   if(WiFi.status()== WL_CONNECTED){
     WiFiClient client;
     HTTPClient http;  
-    http.begin(client, "http://192.168.219.105:5100/QR");  
+    http.begin(client, "http://122.45.4.113:5100/QR");  
     http.addHeader("Content-Type", "application/json");   
     String postMessage = "{\"qrcode\":\"" + qrCode + "\"}";  
     int httpResponseCode = http.POST(postMessage);   
