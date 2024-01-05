@@ -20,10 +20,14 @@ class GPIO:
         self.session = requests.Session()
 
     def select(self):
-        print("Connected COM ports: " + str(self.connected))
-        select_comport = input('select:')
-        self.ser = serial.Serial(select_comport, 115200, timeout = 0.2)
-        print("\n")
+        try:
+            print("Connected COM ports: " + str(self.connected))
+            select_comport = input('select:')
+            self.ser = serial.Serial(select_comport, 115200, timeout = 0.2)
+            print("\n")
+        except:
+            self.__init__()
+            self.select()
     
     def read(self):
         if self.ser.in_waiting > 0:
