@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 app = FastAPI()
-templates = Jinja2Templates(directory="D:\\Joffice\\ClassLinker\\ESP_QR_READ\\SER\\SER_FAST_api")
+templates = Jinja2Templates(directory="/src")
 
 def save_qrcode_to_db(qrcode: str):
     directory = 'C:\\DB'
@@ -43,4 +43,4 @@ def post_qrcode(request: Request, qrcode: str = Form(...)):
     return templates.TemplateResponse("FAST_index.html", {"request": request, "qrcode": qrcode})
 
 if __name__ == "__main__":
-    uvicorn.run(app, host='192.168.0.20', port=5100)
+    uvicorn.run(app, host='0.0.0.0', port=5100)
