@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Realtime Update</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>QR Code Display</title>
 </head>
 <body>
-    <h1 id="qr-code">Waiting for update...</h1>
-
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var socket = new WebSocket("ws://" + location.host + "/ws");
-            socket.onmessage = function(event) {
-                var data = JSON.parse(event.data);
-                $('#qr-code').text(data.qr_code);
-            }
-        });
-    </script>
+    <h1>QR Code Data</h1>
+    <form action="/QR" method="post">
+        <input type="text" name="qrcode" placeholder="Enter QR code data">
+        <input type="submit" value="Submit">
+    </form>
+    {% if qrcode %}
+        <h2>Submitted QR Code:</h2>
+        <p>{{ qrcode }}</p>
+    {% endif %}
 </body>
 </html>
