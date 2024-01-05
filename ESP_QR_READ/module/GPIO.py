@@ -49,9 +49,13 @@ class GPIO:
 if __name__ == "__main__":
     # GPIO 객체 생성 및 사용
     gpio = GPIO()
-    gpio.select()
     while True:
-        gpio.read()
-        # gpio.send_data_to_server()
+        try:
+            gpio.read() 
+            # gpio.send_data_to_server()
+        except:
+            print("GPIO 연결 해제\n센서 연결 상태 확인 바람")
+            
+       
             
         
