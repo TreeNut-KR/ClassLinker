@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import queue
 import time
 import serial
@@ -30,7 +31,7 @@ class GPIO:
                 self.q.put(data)
 
     def send_data_to_server(self):
-        url = 'http://192.168.0.20:5100/QR'
+        url = 'http://222.100.190.53:5100/QR'
         if not self.q.empty():
             data = self.q.get()
             print(f'\nRead data: {data}')
