@@ -25,20 +25,22 @@ class GPIO:
     def read(self):
         if self.ser.in_waiting > 0:
             self.data = self.ser.readline().decode('utf-8').rstrip()
-            print(self.data)
             datas = self.data.split('\r')
             for data in datas:
                 self.q.put(data)
 
     def send_data_to_server(self):
-        url = 'http://localhost:5100/QR'
+        url = 'http://192.168.0.20:5100/QR'
         if not self.q.empty():
             data = self.q.get()
-            print(f'Read data: {data}')
+            print(f'\nRead data: {data}')
             payload = {'qrcode': data}
             try:
+                start_time = time.time()
                 response = requests.post(url, data=payload)
-                print(f'Status Code: {response.status_code}, Response: {response.text}')
+                elapsed_time = time.time() - start_time  # 경과 시간 계산
+                print(f'Status Code: {response.status_code}, Response: {data}')
+                print(f'Time taken from QR read to POST: {elapsed_time} seconds\n')  # 경과 시간 출력
             except Exception as e:
                 print(f"Error: {e}")
 
