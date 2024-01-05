@@ -6,9 +6,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLa
 from PyQt5.QtGui import QFont, QFontDatabase, QKeyEvent
 from PyQt5.QtCore import Qt
 
-from FU.api import aligo
-from FU.QR import QRcode_read
-from FU.camera import Camera
+from module.api import aligo
+from module.QR import QRcode_read
+from module.camera import Camera
 
 class FunctionClass(QWidget):
     def __init__(self):
