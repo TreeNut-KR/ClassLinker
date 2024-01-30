@@ -5,21 +5,13 @@ EXPOSE 5100
 RUN mkdir /src
 
 COPY ./FASTapi.py /src/FASTapi.py
-
 COPY ./FAST_index.html /src/FAST_index.html
-
 RUN pip install fastapi
-
 RUN pip install uvicorn
-
 RUN pip install sqlalchemy
-
 RUN pip install dataset
-
 RUN pip install sqlite-utils
-
 RUN pip install jinja2
-
 RUN pip install python-multipart
 
 ENTRYPOINT ["python", "/src/FASTapi.py"]

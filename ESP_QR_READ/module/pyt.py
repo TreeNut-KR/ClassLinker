@@ -1,4 +1,4 @@
-from api import aligo
+from ESP_QR_READ.module.aligo_api import aligo
 
 receiver_name = '서정훈'  # 테스트하려는 수신자의 이름
 aligo_instance = aligo(receiver_name)

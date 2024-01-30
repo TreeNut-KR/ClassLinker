@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 
-from api import aligo
+from ESP_QR_READ.module.aligo_api import aligo
 
 user_dict = {'012030831':'서정훈', '911378837':'김준건', '784981354':'고범준'}
 user_num_dict = {'서정훈': '01080091358', '김준건':'01072821097', '고범준':'01025997894'}
