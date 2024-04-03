@@ -23,7 +23,7 @@ class GPIO:
         try:
             print("Connected COM ports: " + str(self.connected))
             select_comport = input('select:')
-            self.ser = serial.Serial(select_comport, 115200, timeout = 0.2)
+            self.ser = serial.Serial(select_comport, 9600, timeout = 0.2)
             print("\n")
         except:
             self.__init__()
@@ -31,7 +31,7 @@ class GPIO:
     
     def read(self):
         if self.ser.in_waiting > 0:
-            self.data = self.ser.readline().decode('utf-8').rstrip()
+            self.data = self.ser.readline().decode().rstrip()
             print(self.data)
             # datas = self.data.split('\r')
             # for data in datas:
