@@ -1,0 +1,17 @@
+{
+  "name": "classlinker",
+  "version": "1.0.0",
+  "description": "![transparent](https://capsule-render.vercel.app/api?type=transparent&fontColor=A991E5&text=CLASS%20LINKER&height=150&fontSize=60&desc=By%20Joffice%20:%20Kim,%20Seo,%20Goe&descAlignY=75&descAlign=60)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2"
+  }
+}
