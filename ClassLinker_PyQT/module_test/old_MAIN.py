@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 
 from module.api import aligo
 from module.QR import QRcode_read
-from module.camera import Camera
+from ClassLinker_PyQT.module_test.camera import Camera
 
 class FunctionClass(QWidget):
     def __init__(self):
