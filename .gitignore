@@ -138,4 +138,4 @@ cython_debug/
 .idea/
 
 # Exclude .ini files
-.ini
+config.ini
