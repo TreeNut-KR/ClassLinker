@@ -45,8 +45,8 @@ class aligo():
         return send_response.json().get('message'), self.receiver_name, send_response.json().get('msg_type')
 
 # 서정훈 님에게 테스트 문자 보내기
-receiver_name = "서정훈"
-receiver_num = "01080091358"
+receiver_name = "김동혁"
+receiver_num = "01076127155"
 
 # aligo 클래스의 인스턴스 생성
 aligo_instance = aligo(receiver_name, receiver_num)

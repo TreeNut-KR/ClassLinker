@@ -22,7 +22,7 @@ class GPIO:
     def select(self):
         try:
             print("Connected COM ports: " + str(self.connected))
-            select_comport = input('select:')
+            select_comport = "/dev/ttyUSB0"
             self.ser = serial.Serial(select_comport, 9600, timeout = 0.2)
             print("\n")
         except:
@@ -32,6 +32,7 @@ class GPIO:
     def read(self):
         if self.ser.in_waiting > 0:
             self.data = self.ser.readline().decode().rstrip()
+            self.ser.write(b'0x80')  # 수정된 부분: send_data 대신 write 사용, 문자열을 바이트로 인코딩
             print(self.data)
             # datas = self.data.split('\r')
             # for data in datas:
