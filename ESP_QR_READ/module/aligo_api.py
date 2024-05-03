@@ -25,14 +25,14 @@ class aligo():
 
         
         self._sms_data = {
-            'key': value['sms']['key'],
-            'userid': value['sms']['userid'],
-            'sender': value['sms']['sender'],
+            'key': value['sms']['SMS_KEY'],
+            'userid': value['sms']['SMS_USERID'],
+            'sender': value['sms']['SMS_SENDER'],
             'receiver': self.receiver_num,
-            'msg': value['sms']['msg'],
-            'msg_type': value['sms']['msg_type'],
-            'title': value['sms']['title'],
-            'testmode_yn': value['sms']['testmode_yn']
+            'msg': value['sms']['SMS_MSG'],
+            'msg_type': value['sms']['SMS_MSG_TYPE'],
+            'title': value['sms']['SMS_TITLE'],
+            'testmode_yn': value['sms']['SMS_TESTMODE_YN']
         }
 
     def send_sms(self) -> Tuple[str, str, str]:
