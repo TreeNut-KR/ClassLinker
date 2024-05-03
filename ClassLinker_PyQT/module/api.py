@@ -40,3 +40,16 @@ class aligo():
         send_response = requests.post(self.send_url, data=self.sms_data)
 
         return send_response.json().get('message'), self.receiver_name, send_response.json().get('msg_type')
+
+# 서정훈 님에게 테스트 문자 보내기
+receiver_name = "서정훈"
+receiver_num = "01080091358"
+
+# aligo 클래스의 인스턴스 생성
+aligo_instance = aligo(receiver_name, receiver_num)
+
+# 문자 메시지 전송
+send_result = aligo_instance.send_sms()
+
+# 전송 결과 출력
+print(send_result)

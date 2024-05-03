@@ -1,8 +1,9 @@
 from selenium import webdriver
-from selenium.webdriver.edge import service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium import webdriver
+from selenium.webdriver.firefox.service import Service
 import time
 
 from api import aligo
@@ -11,23 +12,18 @@ user_dict = {'012030831':'서정훈', '911378837':'김준건', '784981354':'고�
 user_num_dict = {'서정훈': '01080091358', '김준건':'01072821098', '고범준':'01025997894'}
 
 qrcode_text = ""
-# 옵션 설정
-options = webdriver.EdgeOptions()
-options.add_experimental_option('excludeSwitches', ['enable-logging'])
-options.use_chromium = True
-options.add_experimental_option("detach", True)
+# Firefox 옵션 설정
+options = webdriver.FirefoxOptions()
+options.add_argument('--headless')  # 브라우저 창 없이 실행
 
-# Edge 파일 위치 설정
-options.binary_location = "C:\\Program Files (x86)\\Microsoft\\Edge Dev\\Application\\msedge.exe"
-s = service.Service(r"msedgedriver.exe")
+# Firefox 드라이버 생성
+driver = webdriver.Firefox(options=options)
 
-# Edge 드라이버 생성
-driver = webdriver.Edge(options=options, service=s)
 driver.get('http://122.45.4.113:5100/')
 
 # WebDriverWait를 사용하여 qrcode 요소의 값을 주기적으로 확인
 wait = WebDriverWait(driver, 10)  # 최대 10초 동안 대기
-qrcode_element = driver.find_element(By.ID, 'qr-code')
+qrcode_element = wait.until(EC.visibility_of_element_located((By.ID, 'qr-code')))
 
 while True:
     try:
@@ -38,8 +34,6 @@ while True:
             if receiver_name is None:
                 print("해당 사용자는 서버에 등록되지 않았습니다.")
                 continue
-            qrcode_text = qrcode_element.text
-            # qrcode 요소의 텍스트 값을 가져옵니다.
             print("QR Code Value:", qrcode_text, "QR Code user:", receiver_name)
             aligo_instance = aligo(receiver_name, receiver_num)
             # SMS를 보냅니다.

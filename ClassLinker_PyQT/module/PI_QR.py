@@ -37,21 +37,23 @@ class GPIO:
             # for data in datas:
             #     self.q.put(data)
 
-    def send_data_to_server(self):
-        url = 'http://localhost:5100/QR'
-        headers = {'Content-Type': 'application/json'}
-        if not self.q.empty():
-            data = self.q.get()
-            print(f'Read data: {data}')
-            payload = {'qrcode': data}
-            try:
-                start_time = time.time()  # 시작 시간 측정
-                response = self.session.post(url, json=payload, headers=headers)
-                elapsed_time = time.time() - start_time  # 경과 시간 계산
-                print(f'queue range: {self.q.qsize()}\nStatus Code: {response.status_code}, Response: {response.text}')
-                print(f'Time taken from QR read to POST: {elapsed_time} seconds\n')  # 경과 시간 출력
-            except:
-                print("error")
+    # def send_data_to_server(self):
+    #     url = 'http://localhost:5100/QR'
+    #     headers = {'Content-Type': 'application/json'}
+    #     if not self.q.empty():
+    #         data = self.q.get()
+    #         print(f'Read data: {data}')
+    #         payload = {'qrcode': data}
+    #         try:
+    #             start_time = time.time()  # 시작 시간 측정
+    #             response = self.session.post(url, json=payload, headers=headers)
+    #             elapsed_time = time.time() - start_time  # 경과 시간 계산
+    #             print(f'queue range: {self.q.qsize()}\nStatus Code: {response.status_code}, Response: {response.text}')
+    #             print(f'Time taken from QR read to POST: {elapsed_time} seconds\n')  # 경과 시간 출력
+    #         except:
+    #             print("error")
+
+    
 
 if __name__ == "__main__":
     # GPIO 객체 생성 및 사용
