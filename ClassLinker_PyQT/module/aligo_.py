@@ -52,7 +52,7 @@ class aligo:
         return send_response.json().get('message'), send_response.json().get('msg_type')
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000, log_level="info")
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
     # # 서정훈 님에게 테스트 문자 보내기
     # receiver_name = "서정훈"

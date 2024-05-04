@@ -1,5 +1,5 @@
 import os
-import qrencode
+import qrcode
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
 from PyQt5.QtGui import QPixmap
 
