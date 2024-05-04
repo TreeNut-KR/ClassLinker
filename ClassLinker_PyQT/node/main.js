@@ -20,15 +20,6 @@ app.use(express.static(__dirname + '/public'));
 import('node-fetch').then(({default: fetch}) => {
     app.get('/', async (req, res) => {
         try {
-            // Send POST request to FastAPI
-            const response = await fetch('http://127.0.0.1:5000', {
-                method: 'POST', // Use POST method
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // Send JSON string in the request body
-                body: JSON.stringify({content: "여기에 전송할 데이터를 입력하세요."})
-            });
             const data = await response.json();
             // Make sure to pass the correct data structure to the EJS template
             res.render('index', { message: data.message }); // 수정된 부분
