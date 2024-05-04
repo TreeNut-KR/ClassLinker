@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout, QLa
 from PyQt5.QtGui import QFont, QFontDatabase, QKeyEvent
 from PyQt5.QtCore import Qt
 
-from ClassLinker_PyQT.module.aligo_module import aligo
+from ClassLinker_PyQT.module.aligo_ import aligo
 from module.QR import QRcode_read
 from ClassLinker_PyQT.module_test.camera import Camera
 

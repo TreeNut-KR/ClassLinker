@@ -1,67 +1,43 @@
-import queue
-import time
+import requests
 import serial
 import serial.tools.list_ports as sp
-import requests  # 서버로 POST 요청을 보내기 위한 라이브러리
+import queue
 
-class GPIO:
-    def __init__(self) -> None:
-        """
-        CP210x UART to USB를 사용한 윈도우 환경
-        """
-        self.list = sp.comports()
-        self.data = ""
-        self.connected = []
-        self.q = queue.Queue()  # 큐 생성
-        for i in self.list:
-            print(i)
-            self.connected.append(i.device)
-        # requests Session 객체 생성
+class SerialReader:
+    def __init__(self, comport="/dev/ttyUSB0", baudrate=9600, timeout=0.2):
+        self.comport = comport
+        self.baudrate = baudrate
+        self.timeout = timeout
+        self.ser = None
+        self.connect()
+
+    def connect(self):
+        try:
+            self.ser = serial.Serial(self.comport, self.baudrate, timeout=self.timeout)
+        except Exception as e:
+            print(e)
+
+    def read_line(self):
+        if self.ser and self.ser.in_waiting > 0:
+            return self.ser.readline().decode().rstrip()
+        return None
+
+class FastAPIClient:
+    def __init__(self, url):
+        self.url = url
         self.session = requests.Session()
 
-    def select(self):
-        try:
-            print("Connected COM ports: " + str(self.connected))
-            select_comport = "/dev/ttyUSB0"
-            self.ser = serial.Serial(select_comport, 9600, timeout = 0.2)
-            print("\n")
-        except:
-            self.__init__()
-            self.select()
-    
-    def read(self):
-        if self.ser.in_waiting > 0:
-            self.data = self.ser.readline().decode().rstrip()
-            self.ser.write(b'0x80')  # 수정된 부분: send_data 대신 write 사용, 문자열을 바이트로 인코딩
-            print(self.data)
-            # datas = self.data.split('\r')
-            # for data in datas:
-            #     self.q.put(data)
-
-    # def send_data_to_server(self):
-    #     url = 'http://localhost:5100/QR'
-    #     headers = {'Content-Type': 'application/json'}
-    #     if not self.q.empty():
-    #         data = self.q.get()
-    #         print(f'Read data: {data}')
-    #         payload = {'qrcode': data}
-    #         try:
-    #             start_time = time.time()  # 시작 시간 측정
-    #             response = self.session.post(url, json=payload, headers=headers)
-    #             elapsed_time = time.time() - start_time  # 경과 시간 계산
-    #             print(f'queue range: {self.q.qsize()}\nStatus Code: {response.status_code}, Response: {response.text}')
-    #             print(f'Time taken from QR read to POST: {elapsed_time} seconds\n')  # 경과 시간 출력
-    #         except:
-    #             print("error")
-
-    
+    def send_data(self, data):
+        payload = {'qr_data': data}
+        response = self.session.post(self.url, json=payload)
+        print("Data sent to FastAPI:", response.text)
 
 if __name__ == "__main__":
-    # GPIO 객체 생성 및 사용
-    gpio = GPIO()
-    gpio.select()
+    serial_reader = SerialReader()
+    fastapi_client = FastAPIClient("http://localhost:8000/qr")
+
     while True:
-        gpio.read()
-        # gpio.send_data_to_server()
-            
-        
+        data = serial_reader.read_line()
+        if data:
+            print(data)
+            fastapi_client.send_data(data)
