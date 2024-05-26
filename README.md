@@ -28,3 +28,14 @@
 :--:|:---
 `ClassLinker PyQT` | 기존에 개발 중이였던 PyQT5 앱 및 카메라를 통한 QR 인식 시스템</br>작성일 기준 프로젝트의 개발 방향 변경으로 보류 
 `ESP QR READ` | 개발 방향 변경으로 인한 새로운 프로젝트</br> RaspBerry PI 5를 리더기 보드로 사용하여 GPIO로 연결된 GM65로 읽힌 값을 서버에 데이터 전송</br>서버에서 데이터를 처리할 때 DB 파일로 QR 값 저장
+
+## setup_venv.sh
+```bash
+chmod +x setup_venv.sh
+./setup_venv.sh
+```
+
+## pyinstaller 
+```bash
+pyinstaller --onefile ClassLinker_PyQT/module/PI_QR.py
+```
