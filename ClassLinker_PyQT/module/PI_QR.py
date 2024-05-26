@@ -4,7 +4,7 @@ import serial.tools.list_ports as sp
 import queue
 
 class SerialReader:
-    def __init__(self, comport="/dev/ttyUSB0", baudrate=9600, timeout=0.2):
+    def __init__(self, comport="COM4", baudrate=9600, timeout=0.2): #/dev/ttyUSB0
         self.comport = comport
         self.baudrate = baudrate
         self.timeout = timeout
@@ -34,7 +34,7 @@ class FastAPIClient:
 
 if __name__ == "__main__":
     serial_reader = SerialReader()
-    fastapi_client = FastAPIClient("http://192.168.0.20:8000/qr")
+    fastapi_client = FastAPIClient("http://192.168.219.105:8000/qr")
 
     while True:
         data = serial_reader.read_line()
