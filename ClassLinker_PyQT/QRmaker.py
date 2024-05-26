@@ -40,7 +40,7 @@ class QRCodeGenerator(QMainWindow):
             qr.make(fit=True)
             qr_image = qr.make_image(fill_color="black", back_color="white")
                 
-            folder_path = "QR_FILE"
+            folder_path = ".QR_FILE"
             if not os.path.exists(folder_path):
                 os.makedirs(folder_path)
             
