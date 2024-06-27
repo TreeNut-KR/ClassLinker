@@ -99,7 +99,7 @@ cnx = mysql.connector.connect(**db_config)
 
 def get_parent_contact(QR: str) -> tuple:
     '''
-    정상    : 학생 이름과 부모님 연락처를 반환 
+    정상    : 학생 이름과 부모님 연락처를 반환
     비정상  : 에러 메시지와 None 반환.
     '''
     try:
@@ -118,7 +118,7 @@ def get_parent_contact(QR: str) -> tuple:
 @app.post("/qr", response_model=QRresult, summary="QR Code 수신")
 def receive_qr(request_data: QRdata) -> QRresult:
     '''
-    출석 키호스크에서 QR코드를 전달 받아 Aligo Web 발신 후 
+    출석 키호스크에서 QR코드를 전달 받아 Aligo Web 발신 후
     성공 여부를 반환합니다.
 
     Args:\n\n
