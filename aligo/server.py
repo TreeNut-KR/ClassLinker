@@ -53,7 +53,7 @@ class QRresult(BaseModel):
     send_result: Any = Field(..., title="전송 결과")
 
 
-class Aligo: 
+class Aligo:
     def __init__(self) -> None:
         load_dotenv()  # .env 파일 로드
         self.send_url = 'https://apis.aligo.in/send/'
