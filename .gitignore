@@ -139,3 +139,9 @@ cython_debug/
 
 # Exclude .ini files
 config.ini
+
+
+Python-3.12.1
+Python-3.12.1.tgz
+
+node_modules
