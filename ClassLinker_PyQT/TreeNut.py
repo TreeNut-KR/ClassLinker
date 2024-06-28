@@ -1,3 +1,4 @@
+import os
 import queue
 import subprocess
 import tkinter as tk
@@ -7,6 +8,7 @@ from tkinter import scrolledtext
 import requests
 import serial
 import serial.tools.list_ports as sp
+from PIL import Image, ImageTk
 
 # 암호와 실행할 명령어 설정
 password = '0000'
@@ -96,8 +98,18 @@ def set_url(fastapi_client, url_entry, text_area):
 def setup_ui(fastapi_client):
     root = tk.Tk()
     root.title("TreeNut")  # 프로그램 이름 변경
-    root.iconname("TreeNut")  # 작업 표시줄 아이콘 이름 변경
-
+    # 아이콘 파일 경로 설정
+    icon_path = os.path.join(os.path.dirname(__file__), 'treenut.ico')
+    
+    # 아이콘 설정
+    if os.path.exists(icon_path):
+        try:
+            img = ImageTk.PhotoImage(Image.open(icon_path))
+            root.tk.call('wm', 'iconphoto', root._w, img)
+        except Exception as e:
+            print(f"Icon setting failed: {e}")
+    else:
+        print(f"Error: {icon_path} 파일을 찾을 수 없습니다.")
     # 창의 크기를 고정
     root.geometry("600x500")
     root.resizable(False, False)
