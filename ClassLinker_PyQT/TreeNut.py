@@ -19,7 +19,7 @@ cmd = f"echo {password} | sudo -S {command}"
 subprocess.run(cmd, shell=True, text=True)
 
 class SerialReader:
-    def __init__(self, comport="COM3", baudrate=9600, timeout=0.2):  # /dev/ttyUSB0 or COM4
+    def __init__(self, comport="/dev/ttyUSB0", baudrate=9600, timeout=0.2):  # /dev/ttyUSB0 or COM4
         self.comport = comport
         self.baudrate = baudrate
         self.timeout = timeout
