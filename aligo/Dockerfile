@@ -17,7 +17,7 @@ RUN apt-get update && \
     ln -fs /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
     dpkg-reconfigure -f noninteractive tzdata
 
-# 소스 코드 복사
+# 소스 코드 복사~
 COPY . .
 
 # 어플리케이션 실행

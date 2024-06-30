@@ -1,17 +1,21 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, validator as field_validator
-from typing import Optional, Tuple, Dict, Any
-from dotenv import load_dotenv
-from datetime import datetime
 import ctypes
-from ctypes.wintypes import MAX_PATH
-import requests
-import mysql.connector
 import logging
-import uvicorn
 import os
+from ctypes.wintypes import MAX_PATH
+from datetime import datetime
 from pathlib import Path
 from sys import platform
+from typing import Any, Optional, Tuple, Union
+
+import mysql.connector
+import mysql.connector.cursor
+import requests
+import uvicorn
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field, field_validator
+
+app = FastAPI()
 
 MAX_PATH = 260
 def get_documents_folder():
@@ -20,17 +24,15 @@ def get_documents_folder():
     path_buf = ctypes.create_unicode_buffer(MAX_PATH)
     ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, path_buf)
     return path_buf.value
-
 if platform == "linux" or platform == "linux2":
     documents_path = Path(__file__).parent.parent
 elif platform == "win32":
     documents_path = Path(get_documents_folder())
-
+    
 log_file_path = documents_path / 'Aligo(JMEDU)_logs.log'
+
 if not log_file_path.parent.exists():
     log_file_path.parent.mkdir(parents=True, exist_ok=True)
-
-app = FastAPI()
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -45,15 +47,23 @@ class QRdata(BaseModel):
         if len(v) != 36:
             raise ValueError(f"QR Code는 정확히 36자리여야 합니다. 입력된 값의 길이: {len(v)}")
         return v
+    
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                "qr_data": "3335cf9b-198c-11ef-b8a7-0242c0a87002"
+                }
+            ]
+        }
+    }
 
 class QRresult(BaseModel):
     message: str = Field(..., title="메시지")
-    qr_data: str = Field(..., title="QR 코드")
-    parent_contact: str = Field(..., title="부모 전화번호")
-    send_result: Any = Field(..., title="전송 결과")
+    student_name: Optional[str] = Field(None, title="학생 이름")
+    send_result: Optional[Any] = Field(None, title="전송 결과")
 
-
-class Aligo: 
+class Aligo:
     def __init__(self) -> None:
         load_dotenv()  # .env 파일 로드
         self.send_url = 'https://apis.aligo.in/send/'
@@ -69,18 +79,22 @@ class Aligo:
             'testmode_yn': os.getenv('SMS_TESTMODE_YN')
         }
         
-    def send_sms(self, receiver_name: str, receiver_num: str) -> Tuple[str, str, str]:
+    def send_sms(self, receiver_name: str, receiver_num: str, status: str) -> Tuple[str, str, str]:
+        '''
+        반환값 => (결과 : str, 문자 유형 : str, 타이틀 : str)
+        '''
         self.receiver_name = receiver_name
         self.sms_data['receiver'] = receiver_num
+        current_time = datetime.now().strftime('%H시 %M분')
         # 메시지 포맷
-        current_time = datetime.now().strftime('%Y.%m.%d %H:%M:%S')
-        msg_template = (
-            f"메시지 타입 {os.getenv('SMS_MSG_TYPE')}.\n"
-            f"{self.receiver_name} JMEDU 테스트 메시지.\n"
-            f"등원 시간 {current_time}"
-        )
-        
-        # 기존 self.sms_data 복사 후 'msg'만 업데이트
+        msg_template = ( 
+            "안녕하세요. 제이엠에듀 학원입니다.\n\n"
+            f"금일 {current_time}, {self.receiver_name} 학생이\n"
+            f"{status} 하였습니다.")            
+        # f"[제이엠에듀 출석시스템]\n"
+        # f"■ 성명: {self.receiver_name}\n"
+        # f"■ 시간: {current_time}\n"
+        # f"■ 등·하원: {status}"
         sms_data_updated = self.sms_data.copy()
         sms_data_updated['msg'] = msg_template
         
@@ -95,61 +109,79 @@ db_config = {
     'database': os.getenv('MYSQL_DATABASE'),
     'port': 3306
 }
-cnx = mysql.connector.connect(**db_config)
 
-def get_parent_contact(QR: str) -> tuple:
-    '''
-    정상    : 학생 이름과 부모님 연락처를 반환 
-    비정상  : 에러 메시지와 None 반환.
-    '''
+def procedure_attendance_contact(QR: str, cursor: mysql.connector.cursor) -> Union[Tuple[str, str, str], str]:
+    ''' 반환값 => (번호 : str, 이름 : str, 상태 : str) : tuple'''
     try:
-        with cnx.cursor() as cursor:
-            query = "SELECT name, contact_parent FROM student WHERE student_pk = %s"
-            cursor.execute(query, (QR,))
-            result = cursor.fetchone()
+
+        cursor.callproc('RecordAttendance', (QR,))
+        result_set = next(cursor.stored_results())  # 첫 번째 결과 집합에 직접 접근
+        fetched_result = result_set.fetchone()
             
-        if result:
-            return result[0], result[1]  # 정상적으로 학생 이름과 부모님 연락처를 반환
+        if fetched_result:
+            return fetched_result
         else:
-            return "해당 QR의 학생이 데이터베이스에 존재하지 않습니다.", None  # 에러 메시지와 None 반환
-    except mysql.connector.Error as err:
-        return f"데이터베이스 에러: {err}", None  # 에러 메시지와 None 반환
-
-@app.post("/qr", response_model=QRresult, summary="QR Code 수신")
-def receive_qr(request_data: QRdata) -> QRresult:
-    '''
-    출석 키호스크에서 QR코드를 전달 받아 Aligo Web 발신 후 
-    성공 여부를 반환합니다.
-
-    Args:\n\n
-        qr_data (str): UUID
-
-    예제 요청:
-    {
-        "qr_data": "3335caf1-198c-11ef-b8a7-0242c0a87002"
-    }
-    '''
-    aligo_instance = Aligo()
-    try:
-        student_name, parent_contact = get_parent_contact(request_data.qr_data)
-    
-        if parent_contact is None:
-            raise HTTPException(status_code=422, detail=f"{student_name}의 문자 수신 번호가 누락되었습니다.")
-        else:
-            send_result = aligo_instance.send_sms(student_name, parent_contact)
-            logging.info(f'Received QR Data: {request_data.qr_data} '
-                         f'Student\'s name: {student_name} '
-                         f'Parent\'s Contact: {parent_contact} '
-                         f'aligo: {send_result}')
-            return QRresult(
-                message="QR data and parent's contact received successfully",
-                qr_data=request_data.qr_data,
-                parent_contact=parent_contact,
-                send_result=send_result
-            )
+            return "해당 QR의 학생이 데이터베이스에 존재하지 않습니다."  # 에러 메시지
+        
     except Exception as e:
         logging.error(f'An error occurred: {str(e)}')
-        raise HTTPException(status_code=500, detail="서버에서 처리할 수 없는 요청입니다. 관리자에게 문의해주세요.")
-
-# if __name__ == "__main__":
-#     uvicorn.run(app, host="0.0.0.0", port=8000)
+        raise HTTPException(status_code=500, detail="해당 QR의 학생이 데이터베이스에 존재하지 않습니다.")
+            
+@app.post("/qr", response_model=QRresult, summary="QR Code 수신")
+def receive_qr(request_data: QRdata) -> QRresult:
+    """
+    출석 키호스크에서 QR코드를 전달 받아 Aligo Web 발신 후 성공 여부를 반환합니다.
+    """
+    try:
+        cnx = mysql.connector.connect(**db_config)
+        with cnx.cursor() as cursor:
+            contact_result = procedure_attendance_contact(request_data.qr_data, cursor)
+            cnx.commit()
+        if isinstance(contact_result, str):
+            logging.error(contact_result)
+            return QRresult(message=contact_result)
+        
+        number, name, status = contact_result
+        if status == "leave":
+            logging.error(f"{name} 하원이 완료된 상태")
+            return QRresult(message="금일 하원이 이미 완료되었습니다.", student_name=name)
+        elif status == "wait":
+            return QRresult(message="대기 중입니다. 수업이 끝난 뒤 다시 시도해주세요.", student_name=name)
+        elif status == "attend":
+            attendance_status = "등원"
+        elif status == "already":
+            attendance_status = "하원"
+            
+        try:
+            message, msg_type, title = Aligo().send_sms(receiver_name=name, receiver_num=number, status=attendance_status)
+            
+            logging.info(f'Received QR Data: {request_data.qr_data} '
+                        f'Student\'s name: {name} '
+                        f'Parent\'s Contact: {number} '
+                        f'status: {status}'
+                        f'aligo: {message, msg_type, title}')
+            return QRresult(message=f"{status}: {message}", student_name=name, send_result=msg_type)
+        except Exception as e:
+            
+            cnx.rollback() # 전송 실패 시 attendance_log 롤백
+            logging.error(f'An error occurred while sending SMS: {str(e)}')
+            raise HTTPException(status_code=503, detail="문자 전송 할 수 없는 요청입니다. 관리자에게 문의해주세요.")
+        
+    except ValueError as ve:
+        logging.error(f'An value error occurred: {str(ve)}')
+        raise HTTPException(status_code=422, detail="입력된 데이터가 올바르지 않습니다.")
+    except mysql.connector.Error as err:
+        logging.error(f"등원 기록 중 데이터베이스 오류: {err}")
+        raise HTTPException(status_code=503, detail="등원 기록 중 오류가 발생했습니다. 관리자에게 문의해주세요.")
+    except UnboundLocalError as ue:
+        logging.error(f'Unbound Local Error occurred: {str(ue)}')
+        raise HTTPException(status_code=500, detail="서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요.")
+    except Exception as e:
+            logging.error(f'An error occurred: {str(e)}')
+            raise HTTPException(status_code=500, detail="서버에서 처리할 수 없는 요청입니다. 관리자에게 문의해주세요.")
+    finally:
+        if cnx.is_connected():
+            cnx.close()
+    
+if __name__ == "__main__":
+    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)

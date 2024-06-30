@@ -25,3 +25,4 @@ echo 가상 환경을 활성화하려면 다음 명령을 사용하세요:
 echo CALL %ENV_DIR%\Scripts\activate.bat
 
 ENDLOCAL
+ 
