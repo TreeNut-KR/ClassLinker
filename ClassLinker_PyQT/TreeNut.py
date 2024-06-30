@@ -18,9 +18,8 @@ command = 'chmod a+rw /dev/ttyUSB0'
 cmd = f"echo {password} | sudo -S {command}"
 subprocess.run(cmd, shell=True, text=True)
 
-
 class SerialReader:
-    def __init__(self, comport="/dev/ttyUSB0", baudrate=9600, timeout=0.2):  # /dev/ttyUSB0 or COM4
+    def __init__(self, comport="COM3", baudrate=9600, timeout=0.2):  # /dev/ttyUSB0 or COM4
         self.comport = comport
         self.baudrate = baudrate
         self.timeout = timeout
@@ -72,15 +71,21 @@ def read_serial_and_send(serial_reader, fastapi_client, text_area):
             masked_data = mask_data(data)
             text_area.insert(tk.END, f"Read data: {masked_data}\n", 'info')
             text_area.yview(tk.END)  # 자동 스크롤
-            response = fastapi_client.send_data(data)
-
-            if not isinstance(response, requests.Response):
-                text_area.insert(tk.END, f"Failed: {masked_data}, Error: IP가 정상적으로 연결되지 않았습니다.\n", 'fail')
-            elif response.status_code == 200:
-                text_area.insert(tk.END, f"Success: {masked_data}\n", 'success')
-            else:
-                text_area.insert(tk.END, f"Failed: {masked_data}, Status Code: {response.status_code}, Response: {response.text}\n", 'fail')
+            try:
+                response = fastapi_client.send_data(data)
+                if response.status_code == 200:
+                    text_area.insert(tk.END, f"Success: {masked_data}\n", 'success')
+                else:
+                    text_area.insert(tk.END, f"Failed: {masked_data}, Status Code: {response.status_code}, Response: {response.text}\n", 'fail')
+            except requests.ConnectionError:
+                text_area.insert(tk.END, f"Failed: {masked_data}, Error: 정상적으로 연결되지 않았습니다.\n", 'fail')
+            except requests.Timeout:
+                text_area.insert(tk.END, f"Failed: {masked_data}, Error: 요청 시간이 초과되었습니다.\n", 'fail')
+            except AttributeError as e:
+                text_area.insert(tk.END, f"Failed: {masked_data}, Error: 정상적으로 연결되지 않았습니다.\n", 'fail')
+            
             text_area.yview(tk.END)  # 자동 스크롤
+
 
 
 def validate_ip(input_str):
