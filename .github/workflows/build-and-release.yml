@@ -34,7 +34,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TREENUT_JMEDU_760329 }}
 
       - name: Zip Build Directory
         run: |
