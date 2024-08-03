@@ -87,10 +87,10 @@ class Aligo:
         self.sms_data['receiver'] = receiver_num
         current_time = datetime.now().strftime('%H시 %M분')
         # 메시지 포맷
-        msg_template = ( 
+        msg_template = (
             "안녕하세요. 제이엠에듀 학원입니다.\n\n"
             f"금일 {current_time}, {self.receiver_name} 학생이\n"
-            f"{status} 하였습니다.")            
+            f"{status} 하였습니다.")
         # f"[제이엠에듀 출석시스템]\n"
         # f"■ 성명: {self.receiver_name}\n"
         # f"■ 시간: {current_time}\n"
