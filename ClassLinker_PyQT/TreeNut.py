@@ -3,7 +3,7 @@ import subprocess
 import tkinter as tk
 from threading import Thread
 from tkinter import scrolledtext
-from dotenv import load_dotenv
+from configparser import ConfigParser
 from PIL import Image, ImageTk
 from typing import Optional, Tuple
 
@@ -21,17 +21,20 @@ def run_sudo_command(password: str, command: str) -> None:
     cmd = f"echo {password} | sudo -S {command}"
     subprocess.run(cmd, shell=True, text=True)
 
-def create_env_file(dotenv_path: str) -> None:
-    '''.env 파일을 생성합니다
+def create_ini_file(ini_path: str) -> None:
+    '''.ini 파일을 생성합니다
     
     Args:
-        dotenv_path (str): .env 파일 경로
+        ini_path (str): .ini 파일 경로
     '''
-    if not os.path.exists(dotenv_path):
-        with open(dotenv_path, 'w', encoding='utf-8') as f:
-            f.write("# ↓ Enter information about 'IP' & 'PORT' here.\n")
-            f.write("IP=192.168.1.224\n")
-            f.write("PORT=8100\n")
+    if not os.path.exists(ini_path):
+        config = ConfigParser()
+        config['DEFAULT'] = {
+            'IP': '192.168.1.224',
+            'PORT': '8100'
+        }
+        with open(ini_path, 'w') as configfile:
+            config.write(configfile)
 
 class SerialReader:
     def __init__(self, comport: str = "/dev/ttyUSB0", baudrate: int = 9600, timeout: float = 0.2) -> None:
@@ -223,11 +226,14 @@ def test_connection_and_update_ui(fastapi_client: FastAPIClient, text_area: scro
 def main() -> None:
     '''메인 함수 실행'''
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    dotenv_path = os.path.join(script_dir, '.env')
-    create_env_file(dotenv_path)
-    load_dotenv(dotenv_path)
-    ip = os.getenv("IP")
-    port = os.getenv("PORT")
+    ini_path = os.path.join(script_dir, 'config.ini')
+    create_ini_file(ini_path)
+    
+    config = ConfigParser()
+    config.read(ini_path)
+    
+    ip = config.get('DEFAULT', 'IP')
+    port = config.get('DEFAULT', 'PORT')
 
     if not validate_ip(ip):
         print("유효하지 않은 IP 주소입니다.")
