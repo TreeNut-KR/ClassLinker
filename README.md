@@ -19,21 +19,12 @@ TreeNut 프로그램은 Ubuntu 20.04 LTS 이상의 운영체제에서 사용하�
 
    ```bash
    chmod +x setup_venv.sh
-   ./setup_venv.sh
+   source ./setup_venv.sh
    ```
 
    스크립트가 성공적으로 실행되면, Python 가상환경이 `.venv` 디렉토리에 생성됩니다.
 
-### 2. 프로젝트 의존성 설치
-
-가상환경을 활성화하고 필요한 Python 패키지를 설치합니다:
-
-```bash
-source .venv/bin/activate
-pip install pyserial requests Pillow
-```
-
-### 3. 설정 파일 생성 및 수정
+### 2. 설정 파일 생성 및 수정
 
 1. **`config.ini` 파일 생성**
 
@@ -49,7 +40,7 @@ pip install pyserial requests Pillow
    PORT = <FastAPI 서버의 포트 번호>
    ```
 
-### 4. 실행 파일 생성
+### 3. 실행 파일 생성
 
 1. **PyInstaller를 사용하여 실행 파일 생성**
 
@@ -61,7 +52,7 @@ pip install pyserial requests Pillow
 
    이 명령어는 `dist` 디렉토리에 `TreeNut`이라는 이름의 실행 파일을 생성합니다.
 
-### 5. 시리얼 포트 권한 설정
+### 4. 시리얼 포트 권한 설정
 
 시리얼 포트를 사용하기 위해 적절한 권한을 설정합니다:
 
@@ -69,7 +60,7 @@ pip install pyserial requests Pillow
 sudo chmod a+rw /dev/ttyUSB*
 ```
 
-### 6. 프로그램 실행
+### 5. 프로그램 실행
 
 1. **생성된 실행 파일 실행**
 
