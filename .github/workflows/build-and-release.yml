@@ -3,17 +3,17 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'  # 버전 태그가 푸시될 때마다 워크플로가 실행됩니다.
+      - 'v*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -30,12 +30,11 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v1  # Updated action
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.TREENUT_JMEDU_760329 }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Zip Build Directory
         run: |
