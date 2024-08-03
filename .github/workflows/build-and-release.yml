@@ -35,7 +35,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TREENUT_JMEDU_760329 }}
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
