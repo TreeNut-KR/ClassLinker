@@ -38,9 +38,11 @@ jobs:
 
       - name: Zip Build Directory
         run: zip -r ${{ github.workspace }}/build.zip ./build
-        
+
       - name: Upload Release Asset - TreeNut executable
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TREENUT_JMEDU_760329 }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./dist/TreeNut
@@ -49,6 +51,8 @@ jobs:
 
       - name: Upload Release Asset - Build Directory
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TREENUT_JMEDU_760329 }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/build.zip
