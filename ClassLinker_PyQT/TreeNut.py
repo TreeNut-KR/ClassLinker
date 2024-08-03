@@ -37,10 +37,22 @@ def create_ini_file(ini_path: str) -> None:
         with open(ini_path, 'w') as configfile:
             config.write(configfile)
 
+def find_serial_port() -> Optional[str]:
+    '''연결된 시리얼 포트를 자동으로 검색
+    
+    Returns:
+        Optional[str]: 발견된 시리얼 포트 경로 또는 None
+    '''
+    ports = sp.comports()
+    if ports:
+        # 첫 번째 연결된 포트를 반환
+        return ports[0].device
+    return None
+
 class SerialReader:
-    def __init__(self, comport: str = "/dev/ttyUSB0", baudrate: int = 9600, timeout: float = 0.2) -> None:
+    def __init__(self, comport: Optional[str] = None, baudrate: int = 9600, timeout: float = 0.2) -> None:
         '''SerialReader 클래스 초기화 및 연결 설정'''
-        self.comport = comport
+        self.comport = comport or find_serial_port()  # 자동으로 포트를 찾음
         self.baudrate = baudrate
         self.timeout = timeout
         self.ser = None
@@ -48,6 +60,9 @@ class SerialReader:
 
     def connect(self) -> None:
         '''시리얼 포트 연결'''
+        if not self.comport:
+            print("No serial port found.")
+            return
         try:
             self.ser = serial.Serial(self.comport, self.baudrate, timeout=self.timeout)
         except Exception as e:
@@ -226,14 +241,9 @@ def test_connection_and_update_ui(fastapi_client: FastAPIClient, text_area: scro
 
 def main() -> None:
     '''메인 함수 실행'''
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    if getattr(sys, 'frozen', False):
-        # PyInstaller로 생성된 경우
-        ini_path = os.path.join(sys._MEIPASS, 'config.ini')
-    else:
-        # 스크립트로 실행되는 경우
-        ini_path = os.path.join(script_dir, 'config.ini')
+    # 문서 폴더 경로 설정
+    documents_dir = os.path.expanduser("~/Documents")
+    ini_path = os.path.join(documents_dir, 'config.ini')
     
     create_ini_file(ini_path)
     
@@ -246,6 +256,9 @@ def main() -> None:
     if not validate_ip(ip):
         print("유효하지 않은 IP 주소입니다.")
         return
+
+    # 시리얼 포트 권한을 설정하기 위해 명령어 실행
+    run_sudo_command(password='0000', command='chmod a+rw /dev/ttyUSB*')
 
     fastapi_client = FastAPIClient(ip, int(port))
     serial_reader = SerialReader()
@@ -261,6 +274,4 @@ def main() -> None:
     root.mainloop()
 
 if __name__ == "__main__":
-    # sudo 명령어 실행
-    run_sudo_command(password='0000', command='chmod a+rw /dev/ttyUSB0')
     main()
