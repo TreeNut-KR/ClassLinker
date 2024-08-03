@@ -82,11 +82,138 @@ git tag
 git push origin <tag> # <tag>를 실제 태그로 수정하여 입력
 ```
 
-### 7. GPG 사용 
-```bash
-git commit -m "Your commit message" -S
+# GPG 키 생성 및 Git 연동 가이드
 
+이 문서는 GPG 키를 생성하고 Git과 연동하는 과정을 단계별로 안내합니다.
+
+## 1. GPG 설치
+
+GPG(GNU Privacy Guard)가 설치되어 있지 않다면 [GPG 공식 사이트](https://gnupg.org/download/)에서 설치합니다.
+
+## 2. GPG 키 생성
+
+### 2.1. GPG 키 생성 명령어 실행
+
+```sh
+gpg --full-generate-key
 ```
+
+### 2.2. 키 종류 선택
+
+```plaintext
+원하는 키 종류를 선택하십시오.
+ (1) RSA 및 RSA
+ (2) DSA와 엘가말
+ (3) DSA(부호만)
+ (4) RSA(부호만)
+ (9) ECC(서명 및 암호화) *기본값*
+ (10) ECC(부호만)
+ (14) 카드의 기존 키
+당신의 선택은? 1
+```
+
+### 2.3. 키 크기 설정
+
+```plaintext
+RSA 키의 길이는 1024비트에서 4096비트 사이일 수 있습니다.
+어떤 키 크기를 원하십니까? (3072) 4096
+```
+
+### 2.4. 키 유효 기간 설정
+
+```plaintext
+키가 얼마나 오래 유효해야 하는지 지정하십시오.
+ 0 = 키가 만료되지 않음
+ <n> = 키가 n일 후에 만료됨
+ <N>W = 키가 n주 후에 만료됨
+ <N>M = 키가 n개월 후에 만료됨
+ <n>y = 키가 n년 후에 만료됨
+키는 유효합니까? (0) 0
+키가 전혀 만료되지 않음
+맞습니까? (y/N) y
+```
+
+### 2.5. 사용자 ID 설정
+
+```plaintext
+실명: CutTheWire
+메일 주소: sjmbee04@gmail.com
+주석:
+이 USER-ID를 선택했습니다.
+ "CutTheWire <sjmbee04@gmail.com>"
+
+(N)ame, (C)omment, (E)mail 또는 (O)kay/(Q)uit? o
+```
+
+## 3. GPG 키 확인
+
+```sh
+gpg --list-secret-keys --keyid-format LONG
+```
+
+출력 예시:
+```plaintext
+sec   rsa4096/77AAF6EF0DB97CB8 2024-08-03 [SC]
+      690496BF5EC2D0F990D0F26977AAF6EF0DB97CB8
+uid                 [ultimate] CutTheWire <sjmbee04@gmail.com>
+ssb   rsa4096/6CDE688F2FE4DE82 2024-08-03 [E]
+```
+
+## 4. Git에 GPG 키 추가
+
+### 4.1. GPG 키 설정
+
+```sh
+git config --global user.signingkey 77AAF6EF0DB97CB8
+```
+
+### 4.2. GPG 프로그램 경로 설정
+
+```sh
+git config --global gpg.program "C:\Program Files (x86)\GnuPG\bin\gpg.exe"
+```
+
+### 4.3. 커밋 서명 활성화
+
+```sh
+git config --global commit.gpgSign true
+```
+
+## 5. 커밋 서명 테스트
+
+```sh
+git commit -S -m "Your commit message"
+```
+
+## 6. 문제 해결
+
+### 6.1. GPG 에이전트 재시작
+
+```sh
+gpgconf --kill gpg-agent
+gpgconf --launch gpg-agent
+```
+
+### 6.2. 환경 변수 설정
+
+```sh
+$env:GPG_TTY=(Get-Host).UI.RawUI.WindowTitle
+```
+
+### 6.3. GPG 키 다시 가져오기
+
+```sh
+gpg --import "path/to/your/private/key"
+```
+
+### 6.4. 테스트 파일로 서명 확인
+
+```sh
+echo "test" > testfile.txt
+gpg --clearsign testfile.txt
+```
+
+이 문서를 참고하여 GPG 키를 생성하고 Git에 연동하여 안전하게 커밋을 서명할 수 있습니다.
 
 ## 주요 기능
 
