@@ -82,6 +82,12 @@ git tag
 git push origin <tag> # <tag>를 실제 태그로 수정하여 입력
 ```
 
+### 7. GPG 사용 
+```bash
+git commit -m "Your commit message" -S
+
+```
+
 ## 주요 기능
 
 - **시리얼 포트 자동 검색 및 연결**: 프로그램이 실행되면 연결된 시리얼 포트를 자동으로 검색하고 연결을 시도합니다.
