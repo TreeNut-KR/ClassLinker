@@ -6,6 +6,7 @@ from tkinter import scrolledtext
 from configparser import ConfigParser
 from PIL import Image, ImageTk
 from typing import Optional, Tuple
+import sys
 
 import requests
 import serial
@@ -226,7 +227,14 @@ def test_connection_and_update_ui(fastapi_client: FastAPIClient, text_area: scro
 def main() -> None:
     '''메인 함수 실행'''
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    ini_path = os.path.join(script_dir, 'config.ini')
+    
+    if getattr(sys, 'frozen', False):
+        # PyInstaller로 생성된 경우
+        ini_path = os.path.join(sys._MEIPASS, 'config.ini')
+    else:
+        # 스크립트로 실행되는 경우
+        ini_path = os.path.join(script_dir, 'config.ini')
+    
     create_ini_file(ini_path)
     
     config = ConfigParser()
