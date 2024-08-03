@@ -39,7 +39,7 @@ jobs:
       - name: Zip Build Directory
         run: |
           zip -r build.zip ./build
-          mv build.zip ${{ github.workspace }}
+          mv build.zip ${{ github.workspace }}/build.zip
 
       - name: Upload Release Asset - TreeNut executable
         uses: actions/upload-release-asset@v1
