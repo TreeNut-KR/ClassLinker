@@ -75,16 +75,16 @@ sudo chmod a+rw /dev/ttyUSB*
 
 ### 6. 버전 태그 푸시
 
-워크플로가 실행되려면, 버전 태그를 푸시해야 합니다. 예를 들어, `v1.0.0`이라는 태그를 푸시하여 새 릴리스를 생성할 수 있습니다:
+워크플로가 실행되려면, 버전 태그를 푸시해야 합니다. 예를 들어, `v1.0.0`이라는 태그를 푸시하여 새 릴리스를 생성할 수 있습니다.
 
 ```bash
-git tag <tag> # <tag>를 실제 태그로 수정, 생성됨
-git push origin <tag> # <tag>를 실제 태그로 수정하여 입력하면 푸시됨
+git tag v1.0.0 # v1.0.0를 실제 태그로 수정, 생성됨
+git push origin v1.0.0 # v1.0.0를 실제 태그로 수정하여 입력하면 푸시됨
 ```
 ### 6. 버전 태그 삭제
 ```bash
-git tag -d <tag> # 로컬에서 태그 삭제
-git push origin --delete <tag> # <tag>를 원격 저장소에서 태그 삭제 
+git tag -d v1.0.0 # v1.0.0를 로컬에서 태그 삭제
+git push origin --delete v1.0.0 # v1.0.0를 원격 저장소에서 태그 삭제 
 ```
 
 # GPG 키 생성 및 Git 연동 가이드
