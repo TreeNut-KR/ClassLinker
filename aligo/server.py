@@ -87,10 +87,10 @@ class Aligo:
         self.sms_data['receiver'] = receiver_num
         current_time = datetime.now().strftime('%H시 %M분')
         # 메시지 포맷
-        msg_template = (
+        msg_template = ( 
             "안녕하세요. 제이엠에듀 학원입니다.\n\n"
             f"금일 {current_time}, {self.receiver_name} 학생이\n"
-            f"{status} 하였습니다.")
+            f"{status} 하였습니다.")            
         # f"[제이엠에듀 출석시스템]\n"
         # f"■ 성명: {self.receiver_name}\n"
         # f"■ 시간: {current_time}\n"
@@ -162,7 +162,6 @@ def receive_qr(request_data: QRdata) -> QRresult:
                         f'aligo: {message, msg_type, title}')
             return QRresult(message=f"{status}: {message}", student_name=name, send_result=msg_type)
         except Exception as e:
-            
             cnx.rollback() # 전송 실패 시 attendance_log 롤백
             logging.error(f'An error occurred while sending SMS: {str(e)}')
             raise HTTPException(status_code=503, detail="문자 전송 할 수 없는 요청입니다. 관리자에게 문의해주세요.")

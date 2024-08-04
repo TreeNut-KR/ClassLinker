@@ -1,0 +1,5 @@
+pyserial==3.5
+pyinstaller==6.7.0
+tk
+pillow
+matplotlib

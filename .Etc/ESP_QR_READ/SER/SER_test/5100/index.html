@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chart.js Line Chart</title>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+    <body>
+        <div style="width:98%;">
+            <canvas id="canvas"></canvas>
+        </div>
+        <script>
+            var ctx = document.getElementById('canvas').getContext('2d');
+            var myLine;
+            var labels = [];
+            var temperatureData = [];
+            var humidityData = [];
+            var lastUpdateTime;
+
+            function fetchDataAndUpdateChart() {
+                fetch('/data')
+                .then(response => response.json())
+                .then(data => {
+                    // Remove duplicates and sort by timestamp
+                    data = data.filter((v, i, a) => a.findIndex(t => (t.timestamp === v.timestamp)) === i)
+                            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                    // Update only if data has been changed
+                    var newUpdateTime = data[data.length - 1]?.timestamp;
+                    if(newUpdateTime !== lastUpdateTime) {
+                        labels = [];
+                        temperatureData = [];
+                        humidityData = [];
+                        
+                        data.forEach(d => {
+                            var date = new Date(d.timestamp);
+                            var hours = date.getHours();
+                            var minutes = "0" + date.getMinutes();
+                            var seconds = "0" + date.getSeconds();
+                            labels.push(hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2));
+                            temperatureData.push(d.temperature);
+                            humidityData.push(d.humidity);
+
+                            // Keep the last 16 elements
+                            if(labels.length > 16) {
+                                labels.shift();
+                                temperatureData.shift();
+                                humidityData.shift();
+                            }
+                        });
+
+                        var config = {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Temperature',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    data: temperatureData,
+                                    fill: false,
+                                }, {
+                                    label: 'Humidity',
+                                    borderColor: 'rgb(54, 162, 235)',
+                                    data: humidityData,
+                                    fill: false,
+                                }]
+                            },
+                            // ... the rest of the config
+                        };
+                        
+                        if(myLine) {
+                            myLine.data = config.data;
+                            myLine.update();
+                        } else {
+                            myLine = new Chart(ctx, config);
+                        }
+
+                        lastUpdateTime = newUpdateTime;
+                    }
+                });
+            }
+            fetchDataAndUpdateChart();
+            setInterval(fetchDataAndUpdateChart, 10000);  // every 10 seconds
+        </script>
+    </body>
+</html>
